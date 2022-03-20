@@ -1,0 +1,18 @@
+{
+    "apiVersion": "example.com/v1alpha1",
+    "kind": "Resource",
+    "metadata": {
+        "generation": 1,
+        "name": "myresource1",
+        "namespace": "default",
+        "resourceVersion": "105572812",
+        "uid": "02102eb3-968b-418a-8023-75df383daa3c"
+    },
+    "spec": {
+        "name": "bestID",
+        "tags": [
+            "tag1",
+            "tag2"
+        ]
+    }
+}

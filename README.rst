@@ -64,6 +64,9 @@ dataclassses into Kubernetes Custom Resource Definitions.
   <BLANKLINE>
 
 
+Create CRD in K8s Cluster
+=========================
+
 It is also possible to install the CRD in a cluster using a Kubernetes Client
 object::
 
@@ -85,6 +88,54 @@ Installation of resource is idempotent, so re-installing an already installed
 resource doesn't raise any exceptions if ``exist_ok=True`` is passed in::
 
   Resource.install(k8s_client, exist_ok=True)
+
+Deserialization
+===============
+
+You can deserialize the JSON from Kubernetes API into Python CR objects by
+using ``from_json`` classmethod on the resource.
+::
+
+   $ cat -p testdata/cr.json
+   {
+    "apiVersion": "example.com/v1alpha1",
+    "kind": "Resource",
+    "metadata": {
+        "generation": 1,
+        "name": "myresource1",
+        "namespace": "default",
+        "resourceVersion": "105572812",
+        "uid": "02102eb3-968b-418a-8023-75df383daa3c"
+    },
+    "spec": {
+        "name": "bestID",
+        "tags": [
+            "tag1",
+            "tag2"
+        ]
+    }
+    }
+
+::
+   >>> import json
+   >>> with open('testdata/cr.json') as fd:
+   ...     json_schema = json.load(fd)
+   >>> res = Resource.from_json(json_schema)
+   >>> print(res.name)
+   bestID
+   >>> print(res.tags)
+   ['tag1', 'tag2']
+
+
+This also loads the Kubernetes's ``V1ObjectMeta`` and sets it as the
+``.metadata`` property of CR::
+
+  >>> print(res.metadata.namespace)
+  default
+  >>> print(res.metadata.name)
+  myresource1
+  >>> print(res.metadata.resource_version)
+  105572812
 
 
 Installing
