@@ -6,9 +6,10 @@ authors = ["Abhilash Raj <raj.abhilash1@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
-apischema = "^0.17.5"
-PyYAML = "^6.0"
+python = ">=3.6,<4"
+apischema = ">=0.15.0"
+PyYAML = ">=6.0"
+kubernetes = "^23.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
