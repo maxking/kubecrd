@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from kubecrd import schemabase
 from apischema import schema
+
+from kubecrd import schemabase
 
 
 @dataclass
