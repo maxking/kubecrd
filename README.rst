@@ -92,8 +92,7 @@ resource doesn't raise any exceptions if ``exist_ok=True`` is passed in::
 Deserialization
 ===============
 
-You can deserialize the JSON from Kubernetes API into Python CR objects by
-using ``from_json`` classmethod on the resource.
+You can deserialize the JSON from Kubernetes API into Python CR objects.
 ::
 
    $ cat -p testdata/cr.json
@@ -116,7 +115,8 @@ using ``from_json`` classmethod on the resource.
     }
     }
 
-::
+by using ``from_json`` classmethod on the resource::
+
    >>> import json
    >>> with open('testdata/cr.json') as fd:
    ...     json_schema = json.load(fd)
