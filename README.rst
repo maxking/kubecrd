@@ -4,7 +4,7 @@ Kube CRD
 
 The primary purpose of this project is to simplify working with Kubernetes
 Custom Resources. To achieve that it provides a base class,
-:py:class:`kubecrd.OpenAPISchemaBase` that can convert regular Python
+``kubecrd.OpenAPISchemaBase`` that can convert regular Python
 dataclassses into Kubernetes Custom Resource Definitions.
 
 
