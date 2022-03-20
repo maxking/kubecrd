@@ -4,7 +4,6 @@ import yaml
 from apischema.json_schema import deserialization_schema
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
-from yaml import Dumper, Loader, dump, load
 
 ObjectMeta_attribute_map = {
     value: key for key, value in V1ObjectMeta.attribute_map.items()
@@ -30,8 +29,8 @@ class OpenAPISchemaBase:
 
     @classmethod
     def apischema_yaml(cls):
-        yaml_schema = load(cls.apischema_json(), Loader=Loader)
-        return dump(yaml_schema, Dumper=Dumper)
+        yaml_schema = yaml.load(cls.apischema_json(), Loader=yaml.Loader)
+        return yaml.dump(yaml_schema, Dumper=yaml.Dumper)
 
     @classmethod
     def singular(cls):
@@ -80,9 +79,9 @@ class OpenAPISchemaBase:
 
     @classmethod
     def crd_schema(cls):
-        return dump(
-            load(json.dumps(cls.crd_schema_dict()), Loader=Loader),
-            Dumper=Dumper,
+        return yaml.dump(
+            yaml.load(json.dumps(cls.crd_schema_dict()), Loader=yaml.Loader),
+            Dumper=yaml.Dumper,
         )
 
     @classmethod
@@ -106,7 +105,7 @@ class OpenAPISchemaBase:
         try:
             utils.create_from_yaml(
                 k8s_client,
-                yaml_objects=[yaml.load(cls.crd_schema(), Loader=Loader)],
+                yaml_objects=[yaml.load(cls.crd_schema(), Loader=yaml.Loader)],
             )
         except utils.FailToCreateError as e:
             code = json.loads(e.api_exceptions[0].body).get('code')
