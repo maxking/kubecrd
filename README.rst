@@ -62,3 +62,26 @@ dataclassses into Kubernetes Custom Resource Definitions.
       served: true
       storage: true
   <BLANKLINE>
+
+
+It is also possible to install the CRD in a cluster using a Kubernetes Client
+object::
+
+  from from kubernetes import client, config
+  config.load_kube_config()
+  k8s_client = client.ApiClient()
+  Resource.install(k8s_client)
+
+You can then find the resource in the cluster::
+
+  » kubectl get crds/resources.example.com
+  NAME                    CREATED AT
+  resources.example.com   2022-03-20T03:58:25Z
+
+  $ kubectl api-resources | grep example.com
+  resources     example.com/v1alpha1                  true         Resource
+
+Installation of resource is idempotent, so re-installing an already installed
+resource doesn't raise any exceptions if ``exist_ok=True`` is passed in::
+
+  Resource.install(k8s_client, exist_ok=True)

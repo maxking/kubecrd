@@ -2,9 +2,9 @@ import json
 
 import yaml
 from apischema.json_schema import deserialization_schema
-from yaml import Dumper, Loader, dump, load
+from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
-
+from yaml import Dumper, Loader, dump, load
 
 ObjectMeta_attribute_map = {
     value: key for key, value in V1ObjectMeta.attribute_map.items()
@@ -42,7 +42,7 @@ class OpenAPISchemaBase:
         return f'{cls.singular()}s'
 
     @classmethod
-    def crd_schema(cls):
+    def crd_schema_dict(cls):
         crd = {
             'apiVersion': 'apiextensions.k8s.io/v1',
             'kind': 'CustomResourceDefinition',
@@ -69,21 +69,28 @@ class OpenAPISchemaBase:
                                 'type': 'object',
                                 'properties': {
                                     'spec': cls.apischema(),
-                                }
+                                },
                             }
                         },
                     }
                 ],
             },
         }
+        return crd
 
-        return dump(load(json.dumps(crd), Loader=Loader), Dumper=Dumper)
+    @classmethod
+    def crd_schema(cls):
+        return dump(
+            load(json.dumps(cls.crd_schema_dict()), Loader=Loader),
+            Dumper=Dumper,
+        )
 
     @classmethod
     def from_json(cls, json_data):
-        """Instantiate the class from json value fetched from Kubernetes.
-        """
-        assert json_data.get('apiVersion') == f'{cls.__group__}/{cls.__version__}'
+        """Instantiate the class from json value fetched from Kubernetes."""
+        assert (
+            json_data.get('apiVersion') == f'{cls.__group__}/{cls.__version__}'
+        )
         assert json_data.get('kind') == cls.__name__
         inputs = {}
         for key, value in json_data.get('metadata').items():
@@ -92,3 +99,17 @@ class OpenAPISchemaBase:
         ins = cls(**json_data.get('spec'))
         ins.metadata = meta
         return ins
+
+    @classmethod
+    def install(cls, k8s_client, exist_ok=True):
+        """Install the CRD in Kubernetes."""
+        try:
+            utils.create_from_yaml(
+                k8s_client,
+                yaml_objects=[yaml.load(cls.crd_schema(), Loader=Loader)],
+            )
+        except utils.FailToCreateError as e:
+            code = json.loads(e.api_exceptions[0].body).get('code')
+            if code == 409 and exist_ok:
+                return
+            raise
