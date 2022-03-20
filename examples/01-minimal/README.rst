@@ -1,0 +1,45 @@
+==========
+CRD Schema
+==========
+
+This is a simple example that simply prints the CRD schema for a given Python
+dataclass. You can run it using::
+
+  $ cd examples/01-minimal
+  $ poetry run python3 example_01.py
+  apiVersion: apiextensions.k8s.io/v1
+  kind: CustomResourceDefinition
+  metadata:
+    name: resources.example.com
+  spec:
+    group: example.com
+    names:
+      kind: Resource
+      plural: resources
+      singular: resource
+    scope: Namespaced
+    versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                tags:
+                  default: []
+                  description: regroup multiple resources
+                  items:
+                    type: string
+                  type: array
+                  uniqueItems: false
+              required:
+              - id
+              - name
+              type: object
+          type: object
+      served: true
+      storage: true
