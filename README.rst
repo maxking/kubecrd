@@ -18,7 +18,6 @@ dataclassses into Kubernetes Custom Resource Definitions.
   ...     __group__ = 'example.com'
   ...     __version__ = 'v1alpha1'
   ...
-  ...     id: UUID
   ...     name: str
   ...     tags: list[str] = field(
   ...         default_factory=list,
@@ -47,9 +46,6 @@ dataclassses into Kubernetes Custom Resource Definitions.
           properties:
             spec:
               properties:
-                id:
-                  format: uuid
-                  type: string
                 name:
                   type: string
                 tags:
@@ -60,7 +56,6 @@ dataclassses into Kubernetes Custom Resource Definitions.
                   type: array
                   uniqueItems: false
               required:
-              - id
               - name
               type: object
           type: object
