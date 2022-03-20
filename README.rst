@@ -45,21 +45,24 @@ dataclassses into Kubernetes Custom Resource Definitions.
       schema:
         openAPIV3Schema:
           properties:
-            id:
-              format: uuid
-              type: string
-            name:
-              type: string
-            tags:
-              default: []
-              description: regroup multiple resources
-              items:
-                type: string
-              type: array
-              uniqueItems: false
-          required:
-          - id
-          - name
+            spec:
+              properties:
+                id:
+                  format: uuid
+                  type: string
+                name:
+                  type: string
+                tags:
+                  default: []
+                  description: regroup multiple resources
+                  items:
+                    type: string
+                  type: array
+                  uniqueItems: false
+              required:
+              - id
+              - name
+              type: object
           type: object
       served: true
       storage: true

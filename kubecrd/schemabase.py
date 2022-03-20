@@ -3,6 +3,12 @@ import json
 import yaml
 from apischema.json_schema import deserialization_schema
 from yaml import Dumper, Loader, dump, load
+from kubernetes.client.models.v1_object_meta import V1ObjectMeta
+
+
+ObjectMeta_attribute_map = {
+    value: key for key, value in V1ObjectMeta.attribute_map.items()
+}
 
 
 class OpenAPISchemaBase:
@@ -59,7 +65,12 @@ class OpenAPISchemaBase:
                         'served': True,
                         'storage': True,
                         'schema': {
-                            'openAPIV3Schema': cls.apischema(),
+                            'openAPIV3Schema': {
+                                'type': 'object',
+                                'properties': {
+                                    'spec': cls.apischema(),
+                                }
+                            }
                         },
                     }
                 ],
@@ -67,3 +78,17 @@ class OpenAPISchemaBase:
         }
 
         return dump(load(json.dumps(crd), Loader=Loader), Dumper=Dumper)
+
+    @classmethod
+    def from_json(cls, json_data):
+        """Instantiate the class from json value fetched from Kubernetes.
+        """
+        assert json_data.get('apiVersion') == f'{cls.__group__}/{cls.__version__}'
+        assert json_data.get('kind') == cls.__name__
+        inputs = {}
+        for key, value in json_data.get('metadata').items():
+            inputs[ObjectMeta_attribute_map.get(key)] = value
+        meta = V1ObjectMeta(**inputs)
+        ins = cls(**json_data.get('spec'))
+        ins.metadata = meta
+        return ins

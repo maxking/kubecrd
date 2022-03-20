@@ -1,0 +1,21 @@
+apiVersion: example.com/v1alpha1
+kind: Resource
+metadata:
+  name: myresource1
+spec:
+  id: "myresourceid"
+  name: "bestID"
+  tags:
+    - "tag1"
+    - "tag2"
+---
+apiVersion: example.com/v1alpha1
+kind: Resource
+metadata:
+  name: myresource2
+spec:
+  id: "myresourceid1234"
+  name: "secondresource"
+  tags:
+    - "tag4"
+    - "tags"
