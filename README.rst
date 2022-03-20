@@ -85,3 +85,11 @@ Installation of resource is idempotent, so re-installing an already installed
 resource doesn't raise any exceptions if ``exist_ok=True`` is passed in::
 
   Resource.install(k8s_client, exist_ok=True)
+
+
+Installing
+==========
+
+Kube CRD can be install from PyPI using pip or your favorite tool::
+
+  $ pip install kubecrd
