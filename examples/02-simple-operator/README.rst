@@ -3,7 +3,7 @@ Simple Operator Example
 =======================
 
 This example includes a simple operator that is built using `Kopf
-<https://kopf.readthedocs.io>`_. Kopf makes the bootstrapping of the operator
+<https://kopf.readthedocs.io>`_. Kopf makes bootstrapping of the operator
 very easy.
 
 
