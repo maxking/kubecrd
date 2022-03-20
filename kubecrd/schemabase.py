@@ -6,8 +6,8 @@ from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
 
 
-# ObjectMeta_attribute_map is simply the reverse of the : :
-# V1ObjectMeta.attribute_map, which is a mapping from python attribute to json
+# ObjectMeta_attribute_map is simply the reverse of the
+# V1ObjectMeta.attribute_map , which is a mapping from python attribute to json
 # key while this is the opposite from json key to python attribute so that we
 # can pass in the values to instantiate the V1ObjectMeta object.
 ObjectMeta_attribute_map = {
