@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "Create Kubernetes CRD using Python dataclasses"
 authors = ["Abhilash Raj <raj.abhilash1@gmail.com>"]
 license = "Apache-2.0"
+readme = README.rst
+repository = "https://github.com/maxking/kubcrd"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/maxking/kubecrd/issues"
 
 [tool.poetry.dependencies]
 python = ">=3.6,<4"
