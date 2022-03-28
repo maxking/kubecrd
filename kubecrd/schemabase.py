@@ -1,6 +1,7 @@
 import json
 
 import yaml
+import kubernetes
 from apischema.json_schema import deserialization_schema
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
@@ -138,6 +139,7 @@ class OpenAPISchemaBase:
             inputs[ObjectMeta_attribute_map.get(key)] = value
         meta = V1ObjectMeta(**inputs)
         ins = cls(**json_data.get('spec'))
+        ins.json = json_data
         ins.metadata = meta
         return ins
 
@@ -161,3 +163,36 @@ class OpenAPISchemaBase:
             if code == 409 and exist_ok:
                 return
             raise
+
+    @classmethod
+    def watch(cls, client):
+        """List and watch the changes in the Resource in Cluster."""
+        api_instance = kubernetes.client.CustomObjectsApi(client)
+        watch = kubernetes.watch.Watch()
+        for event in watch.stream(
+                func=api_instance.list_cluster_custom_object,
+                group=cls.__group__,
+                version=cls.__version__,
+                plural=cls.plural().lower(),
+                watch=True,
+                allow_watch_bookmarks=True,
+                timeout_seconds=50):
+            obj = cls.from_json(event['object'])
+            yield (event['type'], obj)
+
+    @classmethod
+    async def async_watch(cls, k8s_client):
+        """Similar to watch, but uses async Kubernetes client."""
+        from kubernetes_asyncio import client, watch
+        api_instance = client.CustomObjectsApi(k8s_client)
+        watch = watch.Watch()
+        stream = watch.stream(
+            func=api_instance.list_cluster_custom_object,
+            group=cls.__group__,
+            version=cls.__version__,
+            plural=cls.plural().lower(),
+            watch=True,
+        )
+        async for event in stream:
+            obj = cls.from_json(event['object'])
+            yield (event['type'], obj)

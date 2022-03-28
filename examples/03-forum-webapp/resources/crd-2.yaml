@@ -1,0 +1,16 @@
+apiVersion: forum.example.com/v1beta1
+kind: Post
+metadata:
+  name: post2
+  namespace: default
+spec:
+  content: |
+    This is a yaml with a content that is huge.
+    With a second line.
+    And a third line.
+  id: "1234566"
+  published: true
+  tags:
+  - tag3
+  - tag2
+  user: myuser1

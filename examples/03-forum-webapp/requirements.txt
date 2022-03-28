@@ -1,0 +1,5 @@
+falcon
+kubecrd
+apischema
+uvicorn
+kubernetes_asyncio

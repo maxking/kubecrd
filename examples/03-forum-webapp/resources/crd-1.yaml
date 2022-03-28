@@ -1,0 +1,13 @@
+apiVersion: forum.example.com/v1beta1
+kind: Post
+metadata:
+  name: post1
+spec:
+  id: '1234'
+  user: 'myuser'
+  content: |
+    This is a yaml with a content that is huge.
+  tags:
+    - 'tag1'
+    - 'tag2'
+  published: true
