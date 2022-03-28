@@ -1,3 +1,4 @@
+import os
 import asyncio
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -49,23 +50,27 @@ class AllPostsResource:
     """List of all posts"""
 
     async def on_get(self, req, resp):
-        resp.text = """\
-<html>
-  <head>
-    <title>Posts</title>
-  <head>
-  <body>
-    <h1>Posts</h1>
-    <ul id="mylist">
-    </ul>
-    <script type="text/javascript">{0}</script>
-  </body>
-</html>
-""".format(
-            Path('sse.js').read_text()
-        )
+        index_html = Path(__file__).parent.joinpath('index.html')
+        resp.text = index_html.read_text()
         resp.content_type = 'text/html'
         resp.code = 200
+
+    async def on_get_static(self, req, resp, filename):
+        # Security, lol!
+        if filename != 'sse.js':
+            resp.status = 403
+            resp.text = 'Request Unauthorized, Only sse.js can be accessed.'
+
+        # Get the path to the file, if it doesn't exist, return 404.
+        static = Path(__file__).parent.joinpath(filename)
+        print(f'Requested static file {static=}')
+        if not static.exists():
+            resp.status == 404
+            return
+
+        resp.text = static.read_bytes()
+        resp.content_type = 'text/javascript'
+        resp.content_length = os.path.getsize(static)
 
 
 async def emitter(resource):
@@ -86,6 +91,7 @@ async def watch_changes(resource):
 app = falcon.asgi.App()
 app.add_route('/post-sse', PostStreamResource())
 app.add_route('/posts', AllPostsResource())
+app.add_route('/static/{filename}', AllPostsResource(), suffix='static')
 
 
 if __name__ == '__main__':
