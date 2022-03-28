@@ -1,7 +1,6 @@
 import asyncio
 from dataclasses import dataclass, field
 from pathlib import Path
-from pprint import pprint
 
 import falcon
 import kubernetes
