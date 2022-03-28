@@ -35,6 +35,7 @@ function addPost(json_event, parent) {
     const newElement = document.createElement("li");
     newElement.innerHTML = eventAsHtml(json_event);
     newElement.id = json_event.object.metadata.uid;
+    newElement.classList.add('post');
     parent.appendChild(newElement);
 }
 
@@ -45,7 +46,8 @@ function updatePost(json_event) {
     const timeElapsed = Date.now();
     const today = new Date(timeElapsed);
     // Add the last update date to the post.
-    post.innerHTML = html_content + `<small>Updated at ${today.toISOString()}</small>`
+    const new_html = html_content + `<small>Updated at ${today.toISOString()}</small>`;
+    change(post, new_html);
 }
 
 // Create some pretty html for an event to be rendered in the browser.
@@ -57,10 +59,19 @@ function eventAsHtml(event) {
     spec.tags.forEach(function(item, index) {
         htmlcontent += `<span class="tags">${item} </span>`
     })
-    
+
     htmlcontent += "<br/>"
     htmlcontent += `published: ${spec.published}<br/><pre>`
     htmlcontent += spec.content
     htmlcontent += "</pre>"
     return htmlcontent
+}
+
+// Add some little animation when changing
+function change(elem, new_html) {
+    elem.classList.add('hide');
+    elem.innerHTML = new_html;
+    setInterval(function() {
+        elem.classList.remove('hide');
+    }, 500);
 }
