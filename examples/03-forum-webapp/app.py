@@ -1,17 +1,15 @@
-from dataclasses import dataclass, field
-from apischema import schema
-
 import asyncio
-import kubernetes
-import falcon
-
-from kubecrd import OpenAPISchemaBase
-from pprint import pprint
-from falcon.asgi import SSEvent
-
-import kubernetes_asyncio
-from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
+from dataclasses import dataclass, field
 from pathlib import Path
+from pprint import pprint
+
+import falcon
+import kubernetes
+import kubernetes_asyncio
+from apischema import schema
+from falcon.asgi import SSEvent
+from kubecrd import OpenAPISchemaBase
+from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
 
 
 @dataclass
