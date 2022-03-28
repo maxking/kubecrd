@@ -13,6 +13,7 @@ import kubernetes_asyncio
 from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
 from pathlib import Path
 
+
 @dataclass
 class Post(OpenAPISchemaBase):
     __group__ = 'forum.example.com'
@@ -46,6 +47,7 @@ class PostStreamResource:
         """Handles GET requests"""
         resp.sse = emitter(Post)
 
+
 class AllPostsResource:
     """List of all posts"""
 
@@ -62,14 +64,18 @@ class AllPostsResource:
     <script type="text/javascript">{0}</script>
   </body>
 </html>
-""".format(Path('sse.js').read_text())
+""".format(
+            Path('sse.js').read_text()
+        )
         resp.content_type = 'text/html'
         resp.code = 200
+
 
 async def emitter(resource):
     """emitter emits changes to the resource object as Falcon's SSE events."""
     async for happened, obj in watch_changes(resource):
         yield SSEvent(json={'happened': happened, 'object': obj.json})
+
 
 async def watch_changes(resource):
     """Watch changes in resource and yield the values."""
@@ -78,13 +84,14 @@ async def watch_changes(resource):
     async for happened, obj in resource.async_watch(async_client):
         yield happened, obj
 
+
 # Create an ASGI Falcon App that can be run using something like uvcorn.
 app = falcon.asgi.App()
 app.add_route('/post-sse', PostStreamResource())
 app.add_route('/posts', AllPostsResource())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Run python app.py to install the CRD.
     print(f'Installing CRD {Post!r} to cluster.')
     install_crd([Post])
