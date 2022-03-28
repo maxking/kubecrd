@@ -63,7 +63,6 @@ class AllPostsResource:
 
         # Get the path to the file, if it doesn't exist, return 404.
         static = Path(__file__).parent.joinpath(filename)
-        print(f'Requested static file {static=}')
         if not static.exists():
             resp.status == 404
             return
