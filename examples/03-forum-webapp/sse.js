@@ -1,4 +1,9 @@
+// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+// This starts an SSE stream from http://localhost:8000/post-sse
 const evtSource = new EventSource("post-sse")
+
+// When a new event is received from the server, add a new item to the "ul" in the
+// html we are running in.
 evtSource.onmessage = function(event) {
     const newElement = document.createElement("li");
     const eventList = document.getElementById("mylist");
@@ -9,10 +14,12 @@ evtSource.onmessage = function(event) {
     eventList.appendChild(newElement);
 }
 
+// On failure, just log it.
 evtSource.onerror = function(err) {
   console.error("EventSource failed:", err);
 };
 
+// Create some pretty html for an event to be rendered in the browser.
 function eventAsHtml(event) {
     const spec = event.object.spec
     var htmlcontent = `<b>${event.happened}</b><br/>`
