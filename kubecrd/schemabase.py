@@ -208,7 +208,7 @@ class OpenAPISchemaBase:
             'apiVersion': f'{self.__group__}/{self.__version__}',
             'spec': serialize(self),
             'metadata': {
-                'name': str(id(self)),
+                'name': (self.user + str(id(self))).lower(),
             },
         }
         resp = await api_instance.create_namespaced_custom_object(

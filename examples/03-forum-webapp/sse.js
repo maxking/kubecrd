@@ -89,8 +89,12 @@ $(document).ready(function () {
                 $(this).reset();
             },
             error: function (jXHR, textStatus, errorThrown) {
-                console.log(textStatus);
-                console.log(errorThrown);
+                if (!errorThrown) {
+                    console.log(errorThrown);
+                }
+                if (!textStatus) {
+                    console.log(textStatus);
+                }
             }
         });
     });
