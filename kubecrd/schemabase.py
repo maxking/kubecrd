@@ -199,7 +199,7 @@ class OpenAPISchemaBase:
             yield (event['type'], obj)
 
 
-    async def save(self, k8s_client):
+    async def save(self, k8s_client, namespace='default'):
         """Save the instance of this class as a K8s custom resource."""
         from kubernetes_asyncio import client
         api_instance = client.CustomObjectsApi(k8s_client)
@@ -213,7 +213,7 @@ class OpenAPISchemaBase:
         }
         resp = await api_instance.create_namespaced_custom_object(
             group=self.__group__,
-            namespace='default',
+            namespace=namespace,
             version=self.__version__,
             plural=self.plural(),
             body=body,
