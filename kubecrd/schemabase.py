@@ -3,6 +3,7 @@ import json
 import yaml
 import kubernetes
 from apischema.json_schema import deserialization_schema
+from apischema import serialize
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
 
@@ -196,3 +197,25 @@ class OpenAPISchemaBase:
         async for event in stream:
             obj = cls.from_json(event['object'])
             yield (event['type'], obj)
+
+
+    async def save(self, k8s_client):
+        """Save the instance of this class as a K8s custom resource."""
+        from kubernetes_asyncio import client
+        api_instance = client.CustomObjectsApi(k8s_client)
+        body = {
+            'kind': self.__class__.__name__,
+            'apiVersion': f'{self.__group__}/{self.__version__}',
+            'spec': serialize(self),
+            'metadata': {
+                'name': str(id(self)),
+            },
+        }
+        resp = await api_instance.create_namespaced_custom_object(
+            group=self.__group__,
+            namespace='default',
+            version=self.__version__,
+            plural=self.plural(),
+            body=body,
+        )
+        return resp

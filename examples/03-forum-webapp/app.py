@@ -6,7 +6,7 @@ from pathlib import Path
 import falcon
 import kubernetes
 import kubernetes_asyncio
-from apischema import schema
+from apischema import schema, serialize
 from falcon.asgi import SSEvent
 from kubecrd import OpenAPISchemaBase
 from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
@@ -71,6 +71,23 @@ class AllPostsResource:
         resp.content_type = 'text/javascript'
         resp.content_length = os.path.getsize(static)
 
+    async def on_post(self, req, resp):
+        post_data = await req.get_media()
+        if 'tags' in post_data:
+            post_data['tags'] = post_data.get('tags').split(',')
+        if 'published' in post_data:
+            post_data['published'] = (post_data.get('published') == 'on')
+        post = Post(**post_data)
+        client = await get_k8s_client()
+        res = await post.save(client)
+        # 201 created.
+        resp.status = 201
+
+
+async def get_k8s_client():
+    await kubernetes_asyncio.config.load_kube_config()
+    return AsyncApiClient()
+
 
 async def emitter(resource):
     """emitter emits changes to the resource object as Falcon's SSE events."""
@@ -80,8 +97,7 @@ async def emitter(resource):
 
 async def watch_changes(resource):
     """Watch changes in resource and yield the values."""
-    await kubernetes_asyncio.config.load_kube_config()
-    async_client = AsyncApiClient()
+    async_client = await get_k8s_client()
     async for happened, obj in resource.async_watch(async_client):
         yield happened, obj
 

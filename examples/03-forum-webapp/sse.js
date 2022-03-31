@@ -75,3 +75,23 @@ function change(elem, new_html) {
         elem.classList.remove('hide');
     }, 500);
 }
+
+
+$(document).ready(function () {
+    $('#createPostForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url : $(this).attr('action') || window.location.pathname,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                $(this).reset();
+            },
+            error: function (jXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        });
+    });
+});

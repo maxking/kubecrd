@@ -15,6 +15,17 @@
     <h1>Posts</h1>
     <ul id="mylist">
     </ul>
+    <form method="POST" action="/posts" id="createPostForm">
+      <input name="id" value="someid" hidden>
+      <p><label for="user">User</label> <input name="user" type="text" id="user"></p>
+      <p><label for="published">Published</label> <input name="published" type="checkbox" id="published"></p>
+      <p><label for="tags">Tags <small>(comma separated)</small></label> <input name="tags" type="text"></p>
+      <p><label for="content">Content</label></p>
+      <p><textarea name="content" id="content">
+      </textarea></p>
+      <p><input type="Submit"></p>
+    </form>
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
     <script src="/static/sse.js"></script>
   </body>
 </html>
