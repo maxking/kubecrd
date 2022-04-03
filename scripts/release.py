@@ -36,9 +36,13 @@ def prepare_build(ver):
 def upload():
     print('Running twine to upload.')
     try:
-        run_command('twine upload -s dist/*')
+        print(run_command('twine upload -s dist/*'))
     except Exception as e:
         print(f'Failed to upload: {e}')
+
+
+def git_push():
+    print(run_command('git push origin main --tags'))
 
 def main():
     if not len(sys.argv) == 2:
@@ -52,6 +56,7 @@ def main():
     git_tag(ver_tag)
     prepare_build(ver)
     upload()
+    git_push()
 
 
 main()
