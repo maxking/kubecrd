@@ -79,7 +79,7 @@ class AllPostsResource:
             post_data['published'] = (post_data.get('published') == 'on')
         post = Post(**post_data)
         client = await get_k8s_client()
-        res = await post.save(client)
+        res = await post.async_save(client)
         # 201 created.
         resp.status = 201
 

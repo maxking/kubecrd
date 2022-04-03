@@ -183,7 +183,7 @@ class OpenAPISchemaBase:
 
     @classmethod
     async def async_watch(cls, k8s_client):
-        """Similar to watch, but uses async Kubernetes client."""
+        """Similar to watch, but uses async Kubernetes client for aio."""
         from kubernetes_asyncio import client, watch
         api_instance = client.CustomObjectsApi(k8s_client)
         watch = watch.Watch()
@@ -198,24 +198,41 @@ class OpenAPISchemaBase:
             obj = cls.from_json(event['object'])
             yield (event['type'], obj)
 
+    def serialize(self, name_prefix=None):
+        """Serialize the CR as a JSON suitable for POST'ing to K8s API."""
+        if name_prefix is None:
+            name_prefix = self.__class__.__name__.lower()
 
-    async def save(self, k8s_client, namespace='default'):
-        """Save the instance of this class as a K8s custom resource."""
-        from kubernetes_asyncio import client
-        api_instance = client.CustomObjectsApi(k8s_client)
-        body = {
+        return {
             'kind': self.__class__.__name__,
             'apiVersion': f'{self.__group__}/{self.__version__}',
             'spec': serialize(self),
             'metadata': {
-                'name': (self.user + str(id(self))).lower(),
+                'name': (name_prefix + str(id(self))).lower(),
             },
         }
+
+    def save(self, k8s_client, namespace='default'):
+        """Save the instance of this class as a K8s custom resource."""
+        api_instance = kubernetes.client.CustomObjectsApi(k8s_client)
+        resp = api_instance.create_namespaced_custom_object(
+            group=self.__group__,
+            namespace=namespace,
+            version=self.__version__,
+            plural=self.plural(),
+            body=self.serialize(),
+        )
+        return resp
+
+    async def async_save(self, k8s_client, namespace='default'):
+        """Save the instance of this class as a K8s custom resource."""
+        from kubernetes_asyncio import client
+        api_instance = client.CustomObjectsApi(k8s_client)
         resp = await api_instance.create_namespaced_custom_object(
             group=self.__group__,
             namespace=namespace,
             version=self.__version__,
             plural=self.plural(),
-            body=body,
+            body=self.serialize(),
         )
         return resp

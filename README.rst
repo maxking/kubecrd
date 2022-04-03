@@ -89,6 +89,41 @@ resource doesn't raise any exceptions if ``exist_ok=True`` is passed in::
 
   Resource.install(k8s_client, exist_ok=True)
 
+
+Serialization
+=============
+
+You can serialize a Resource such that it is suitable to POST to K8s::
+
+  >>> example = Resource(name='myResource', tags=['tag1', 'tag2'])
+  >>> import json
+  >>> print(json.dumps(example.serialize(), sort_keys=True, indent=4))
+  {
+      "apiVersion": "example.com/v1alpha1",
+      "kind": "Resource",
+      "metadata": {
+          "name": "..."
+      },
+      "spec": {
+          "name": "myResource",
+          "tags": [
+              "tag1",
+              "tag2"
+          ]
+      }
+  }
+
+
+Objects can also be serialized and saved directly in K8s::
+
+  example.save(k8s_client)
+
+Where ``client`` in the above is a Kubernetes client object. You can also use
+asyncio with kubernetes_asyncio client and instead do::
+
+  await example.async_save(k8s_async_client)
+
+
 Deserialization
 ===============
 
@@ -137,6 +172,23 @@ This also loads the Kubernetes's ``V1ObjectMeta`` and sets it as the
   >>> print(res.metadata.resource_version)
   105572812
 
+Watch
+=====
+
+It is possible to Watch for changes in Custom Resources using the standard
+Watch API in Kubernetes. For example, to watch for all changes in Resources::
+
+
+  async for happened, resource in Resource.async_watch(k8s_async_client):
+      print(f'Resource {resource.metadata.name} was {happened}')
+
+
+Or you can use the block sync API for the watch::
+
+
+  for happened, resource in Resource.watch(k8s_client):
+      print(f'Resource {resource.metadata.name} was {happened}')
+  
 
 Installing
 ==========
