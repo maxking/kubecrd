@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kubecrd"
-version = "0.4.0"
+version = "0.5.0"
 description = "Create Kubernetes CRD using Python dataclasses"
 authors = ["Abhilash Raj <raj.abhilash1@gmail.com>"]
 license = "Apache-2.0"
