@@ -20,7 +20,7 @@ def run_command(cmd):
 
 def git_tag(tag):
     print(f'Prepare git tag for {tag}')
-    run_command(f'git tag -a -s -m "Release {tag}" {tag}')
+    run_command(f'git tag -s -m "Release {tag}" {tag}')
 
 
 def prepare_build(ver):
