@@ -16,8 +16,8 @@ ObjectMeta_attribute_map = {
 }
 
 
-class OpenAPISchemaBase:
-    """OpenAPISchemaBase is base class that provides methods to converts dataclass
+class KubeResourceBase:
+    """KubeResourceBase is base class that provides methods to converts dataclass
     into Kubernetes CR. It provides ability to create a Kubernetes CRD from the
     class and supports deserialization of the object JSON from K8s into Python
     obects with support for Metadata.

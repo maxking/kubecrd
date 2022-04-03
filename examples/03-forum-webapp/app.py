@@ -10,11 +10,11 @@ from apischema import schema, serialize
 from falcon.asgi import SSEvent
 from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
 
-from kubecrd import OpenAPISchemaBase
+from kubecrd import KubeResourceBase
 
 
 @dataclass
-class Post(OpenAPISchemaBase):
+class Post(KubeResourceBase):
     __group__ = 'forum.example.com'
     __version__ = 'v1beta1'
 

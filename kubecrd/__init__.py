@@ -1,1 +1,1 @@
-from .schemabase import OpenAPISchemaBase
+from .schemabase import KubeResourceBase

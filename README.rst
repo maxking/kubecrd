@@ -4,17 +4,17 @@ Kube CRD
 
 The primary purpose of this project is to simplify working with Kubernetes
 Custom Resources. To achieve that it provides a base class,
-``kubecrd.OpenAPISchemaBase`` that can create Python
+``kubecrd.KubeResourceBase`` that can create Python
 dataclassses into Kubernetes Custom Resources and also generate and install
 Custom Resource Definitions for those resource into the K8s cluster directly.
 
   >>> from dataclasses import dataclass, field
   >>> from uuid import UUID
-  >>> from kubecrd import OpenAPISchemaBase
+  >>> from kubecrd import KubeResourceBase
   >>> from apischema import schema
 
   >>> @dataclass
-  ... class Resource(OpenAPISchemaBase):
+  ... class Resource(KubeResourceBase):
   ...     __group__ = 'example.com'
   ...     __version__ = 'v1alpha1'
   ...

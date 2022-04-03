@@ -12,7 +12,7 @@ LOCK: asyncio.Lock
 
 
 @dataclass
-class Resource(schemabase.OpenAPISchemaBase):
+class Resource(schemabase.KubeResourceBase):
     __group__ = 'example.com'
     __version__ = 'v1alpha1'
 
