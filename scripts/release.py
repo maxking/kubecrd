@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
 import shlex
 import subprocess
+import sys
 from subprocess import run
 
 
@@ -27,11 +27,14 @@ def prepare_build(ver):
     print(f'Building project')
     output = run_command('poetry version -s').strip()
     if output != ver:
-        print(f'Output of "poetry version -s" "{output}" does not match the provided version "{ver}"')
+        print(
+            f'Output of "poetry version -s" "{output}" does not match the provided version "{ver}"'
+        )
         print('Please update the version or pass the right parameter?')
         exit(1)
     output = run_command('poetry build')
     print(output)
+
 
 def upload():
     print('Running twine to upload.')
@@ -43,6 +46,7 @@ def upload():
 
 def git_push():
     print(run_command('git push origin main --tags'))
+
 
 def main():
     if not len(sys.argv) == 2:

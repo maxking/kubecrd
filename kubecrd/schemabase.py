@@ -1,12 +1,11 @@
 import json
 
-import yaml
 import kubernetes
-from apischema.json_schema import deserialization_schema
+import yaml
 from apischema import serialize
+from apischema.json_schema import deserialization_schema
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
-
 
 # ObjectMeta_attribute_map is simply the reverse of the
 # V1ObjectMeta.attribute_map , which is a mapping from python attribute to json
@@ -171,13 +170,14 @@ class OpenAPISchemaBase:
         api_instance = kubernetes.client.CustomObjectsApi(client)
         watch = kubernetes.watch.Watch()
         for event in watch.stream(
-                func=api_instance.list_cluster_custom_object,
-                group=cls.__group__,
-                version=cls.__version__,
-                plural=cls.plural().lower(),
-                watch=True,
-                allow_watch_bookmarks=True,
-                timeout_seconds=50):
+            func=api_instance.list_cluster_custom_object,
+            group=cls.__group__,
+            version=cls.__version__,
+            plural=cls.plural().lower(),
+            watch=True,
+            allow_watch_bookmarks=True,
+            timeout_seconds=50,
+        ):
             obj = cls.from_json(event['object'])
             yield (event['type'], obj)
 
@@ -185,6 +185,7 @@ class OpenAPISchemaBase:
     async def async_watch(cls, k8s_client):
         """Similar to watch, but uses async Kubernetes client for aio."""
         from kubernetes_asyncio import client, watch
+
         api_instance = client.CustomObjectsApi(k8s_client)
         watch = watch.Watch()
         stream = watch.stream(
@@ -227,6 +228,7 @@ class OpenAPISchemaBase:
     async def async_save(self, k8s_client, namespace='default'):
         """Save the instance of this class as a K8s custom resource."""
         from kubernetes_asyncio import client
+
         api_instance = client.CustomObjectsApi(k8s_client)
         resp = await api_instance.create_namespaced_custom_object(
             group=self.__group__,

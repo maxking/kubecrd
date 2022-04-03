@@ -10,6 +10,7 @@ from kubecrd import schemabase
 
 LOCK: asyncio.Lock
 
+
 @dataclass
 class Resource(schemabase.OpenAPISchemaBase):
     __group__ = 'example.com'
@@ -24,6 +25,7 @@ class Resource(schemabase.OpenAPISchemaBase):
             unique=False,
         ),
     )
+
 
 @kopf.on.startup()
 async def startup_fn(logger, **kwargs):
@@ -41,4 +43,6 @@ def install_crd():
 @kopf.on.event('resources.example.com')
 async def my_handler(event, **_):
     resource = Resource.from_json(event.get('object'))
-    print(f'Got resource {resource.metadata.name} in namespace {resource.metadata.namespace}')
+    print(
+        f'Got resource {resource.metadata.name} in namespace {resource.metadata.namespace}'
+    )

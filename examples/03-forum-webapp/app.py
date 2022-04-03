@@ -1,5 +1,5 @@
-import os
 import asyncio
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -8,8 +8,9 @@ import kubernetes
 import kubernetes_asyncio
 from apischema import schema, serialize
 from falcon.asgi import SSEvent
-from kubecrd import OpenAPISchemaBase
 from kubernetes_asyncio.client.api_client import ApiClient as AsyncApiClient
+
+from kubecrd import OpenAPISchemaBase
 
 
 @dataclass
@@ -76,7 +77,7 @@ class AllPostsResource:
         if 'tags' in post_data:
             post_data['tags'] = post_data.get('tags').split(',')
         if 'published' in post_data:
-            post_data['published'] = (post_data.get('published') == 'on')
+            post_data['published'] = post_data.get('published') == 'on'
         post = Post(**post_data)
         client = await get_k8s_client()
         res = await post.async_save(client)
