@@ -1,11 +1,12 @@
 import json
-
+import re
 import kubernetes
 import yaml
 from apischema import serialize
 from apischema.json_schema import deserialization_schema
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
+from uuid import uuid4 as uuid
 
 # ObjectMeta_attribute_map is simply the reverse of the
 # V1ObjectMeta.attribute_map , which is a mapping from python attribute to json
@@ -14,6 +15,10 @@ from kubernetes.client.models.v1_object_meta import V1ObjectMeta
 ObjectMeta_attribute_map = {
     value: key for key, value in V1ObjectMeta.attribute_map.items()
 }
+
+
+def convert_to_1123(input):
+    return re.sub(r'[^a-zA-Z0-9]+', '-', input).lower()
 
 
 class KubeResourceBase:
@@ -201,15 +206,21 @@ class KubeResourceBase:
 
     def serialize(self, name_prefix=None):
         """Serialize the CR as a JSON suitable for POST'ing to K8s API."""
-        if name_prefix is None:
-            name_prefix = self.__class__.__name__.lower()
+        # use class property name as metadata.name
+        # if not exist, use class name with uuid
+        if hasattr(self, "name"):
+            metadata_name = convert_to_1123(self.name)
+        else:
+            if name_prefix is None:
+                name_prefix = self.__class__.__name__.lower()
+            metadata_name = convert_to_1123(name_prefix + "-" + str(uuid()))
 
         return {
             'kind': self.__class__.__name__,
             'apiVersion': f'{self.__group__}/{self.__version__}',
             'spec': serialize(self),
             'metadata': {
-                'name': (name_prefix + str(id(self))).lower(),
+                'name': metadata_name,
             },
         }
 
