@@ -1,11 +1,12 @@
 import json
-
+import re
 import kubernetes
 import yaml
 from apischema import serialize
 from apischema.json_schema import deserialization_schema
 from kubernetes import utils
 from kubernetes.client.models.v1_object_meta import V1ObjectMeta
+from uuid import uuid4 as uuid
 
 # ObjectMeta_attribute_map is simply the reverse of the
 # V1ObjectMeta.attribute_map , which is a mapping from python attribute to json
@@ -14,6 +15,10 @@ from kubernetes.client.models.v1_object_meta import V1ObjectMeta
 ObjectMeta_attribute_map = {
     value: key for key, value in V1ObjectMeta.attribute_map.items()
 }
+
+
+def convert_to_1123(input):
+    return re.sub(r'[^a-zA-Z0-9]+', '-', input).lower()
 
 
 class KubeResourceBase:
@@ -199,22 +204,31 @@ class KubeResourceBase:
             obj = cls.from_json(event['object'])
             yield (event['type'], obj)
 
+    def spec_json(self):
+        return serialize(self)
+
     def serialize(self, name_prefix=None):
         """Serialize the CR as a JSON suitable for POST'ing to K8s API."""
-        if name_prefix is None:
-            name_prefix = self.__class__.__name__.lower()
+        # use class property name as metadata.name
+        # if not exist, use class name with uuid
+        if hasattr(self, "name"):
+            metadata_name = convert_to_1123(self.name)
+        else:
+            if name_prefix is None:
+                name_prefix = self.__class__.__name__.lower()
+            metadata_name = convert_to_1123(name_prefix + "-" + str(uuid()))
 
         return {
             'kind': self.__class__.__name__,
             'apiVersion': f'{self.__group__}/{self.__version__}',
-            'spec': serialize(self),
+            'spec': self.spec_json(),
             'metadata': {
-                'name': (name_prefix + str(id(self))).lower(),
+                'name': metadata_name,
             },
         }
 
-    def save(self, k8s_client, namespace='default'):
-        """Save the instance of this class as a K8s custom resource."""
+    def create(self, k8s_client, namespace='default'):
+        """Use the instance create a K8s custom resource."""
         api_instance = kubernetes.client.CustomObjectsApi(k8s_client)
         resp = api_instance.create_namespaced_custom_object(
             group=self.__group__,
@@ -222,6 +236,19 @@ class KubeResourceBase:
             version=self.__version__,
             plural=self.plural(),
             body=self.serialize(),
+        )
+        return resp
+
+    def patch(self, k8s_client, namespace='default'):
+        """Use the instance patch a exists K8s custom resource."""
+        api_instance = kubernetes.client.CustomObjectsApi(k8s_client)
+        resp = api_instance.patch_namespaced_custom_object(
+            group=self.__group__,
+            namespace=namespace,
+            version=self.__version__,
+            plural=self.plural(),
+            name=self.metadata.name,
+            body={"spec": self.spec_json()},
         )
         return resp
 
