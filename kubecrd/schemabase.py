@@ -204,6 +204,9 @@ class KubeResourceBase:
             obj = cls.from_json(event['object'])
             yield (event['type'], obj)
 
+    def spec_json(self):
+        return serialize(self)
+
     def serialize(self, name_prefix=None):
         """Serialize the CR as a JSON suitable for POST'ing to K8s API."""
         # use class property name as metadata.name
@@ -218,14 +221,14 @@ class KubeResourceBase:
         return {
             'kind': self.__class__.__name__,
             'apiVersion': f'{self.__group__}/{self.__version__}',
-            'spec': serialize(self),
+            'spec': self.spec_json(),
             'metadata': {
                 'name': metadata_name,
             },
         }
 
-    def save(self, k8s_client, namespace='default'):
-        """Save the instance of this class as a K8s custom resource."""
+    def create(self, k8s_client, namespace='default'):
+        """Use the instance create a K8s custom resource."""
         api_instance = kubernetes.client.CustomObjectsApi(k8s_client)
         resp = api_instance.create_namespaced_custom_object(
             group=self.__group__,
@@ -233,6 +236,19 @@ class KubeResourceBase:
             version=self.__version__,
             plural=self.plural(),
             body=self.serialize(),
+        )
+        return resp
+
+    def patch(self, k8s_client, namespace='default'):
+        """Use the instance patch a exists K8s custom resource."""
+        api_instance = kubernetes.client.CustomObjectsApi(k8s_client)
+        resp = api_instance.patch_namespaced_custom_object(
+            group=self.__group__,
+            namespace=namespace,
+            version=self.__version__,
+            plural=self.plural(),
+            name=self.metadata.name,
+            body={"spec": self.spec_json()},
         )
         return resp
 
